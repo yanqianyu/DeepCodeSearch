@@ -156,7 +156,7 @@ def str2list(ast):
             node = node[0: idx2 + 7] + new_value + node[idx4:]
             # node = node.replace(value, new_value)
         nodes.append(json.loads(node))
-        print(node)
+        # print(node)
 
         if idx + 2 > len(ast):
             break
@@ -215,8 +215,8 @@ def getVocab():
             ast = f.readlines()
             ast = " ".join(ast)
 
-        # ast = str(data[i][-1], encoding="utf-8")[1:-1].replace("=", ":").replace("\n", " ")
-        ast = ast[1:-1].replace("=", ":").replace("\n", " ")
+        ast = str(data[i][-1], encoding="utf-8")[1:-1].replace("=", ":").replace("\n", " ")
+        # ast = ast[1:-1].replace("=", ":").replace("\n", " ")
         # 这一步替换注
         ast = ast.replace("children:", "\"children\":").replace("index:", "\"index\":").replace("value:", "\"value\":").replace("type:", "\"type\":")
         ast = str2list(ast)
