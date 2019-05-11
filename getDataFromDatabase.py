@@ -242,11 +242,14 @@ def getVocab():
         charset='utf8'
     )
     cursor = connect.cursor()
-    sql = """CREATE TABLE NUMREPRESENT (id INT(11) NOT NULL,
-                                        methName BLOB,
-                                        token BLOB,
-                                        desc BLOB,
-                                        apiseq BLOB)"""
+    # todo
+    sql = """CREATE TABLE numrepresent (
+         id  CHAR(20) NOT NULL,
+         methName  CHAR(20),
+         token INT,  
+         desc CHAR(1),
+         apiseq FLOAT )"""
+
     cursor.execute(sql)
 
     for info in datas:
@@ -256,7 +259,7 @@ def getVocab():
         apiseqNum = " ".join(toNum(info["apiseq"], apiseq_vocab_to_int))
 
         insert = """"INSERT INTO NUMREPRESENT(id, methName, token, desc, apiseq)
-                     VALUES(%s,%s,%s,%s,%s,%s)"""
+                     VALUES(%d,%s,%s,%s,%s,%s)"""
         data = (info["id"], methNameNum, tokenNum, descNum, apiseqNum)
         cursor.execute(insert, data)
         connect.commit()
