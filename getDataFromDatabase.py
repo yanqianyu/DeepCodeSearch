@@ -16,7 +16,7 @@ def toNum(data, vocab_to_int):
     # 转为编号表示
     res = []
     for z in parseInput(data):
-        res.append(vocab_to_int[z])
+        res.append(str(vocab_to_int.get(z, vocab_to_int["<UNK>"])))
     return res
 
 
@@ -128,47 +128,12 @@ def getIndex(node):
 
 
 def str2list(ast):
-    # while len(ast) > 0:
-    #     idx = ast.find("},")
-    #     if idx == -1:
-    #         idx = ast.find("}")
-    #     node = ast[:idx + 1]
-    #
-    #     idx1 = node.find("type")
-    #     if idx1 != -1:
-    #         idx3 = node.find(",", idx1)
-    #         if idx3 == -1:
-    #             idx3 = node.find("}", idx1)
-    #         type = node[idx1 + 6: idx3]
-    #         new_type = '"' + type + '"'
-    #         node = node[0: idx1 + 6] + new_type + node[idx3:]
-    #         # node = node.replace(type, new_type)
-    #
-    #     idx2 = node.find("value")
-    #     if idx2 != -1:
-    #         idx4 = node.find(",", idx2)
-    #         if idx4 == -1:
-    #             idx4 = len(node) - 1
-    #             # idx4 = node.find("}", idx2)
-    #         value = node[idx2 + 7: idx4]
-    #         new_value = '"' + value + '"'
-    #         node = node[0: idx2 + 7] + new_value + node[idx4:]
-    #         # node = node.replace(value, new_value)
-    #
-    #     id += 1
-    #     if id == 200:
-    #         print(' ')
-    #     nodes.append(json.loads(node))
-    #     print(node)
-    #
-    #     if idx + 2 > len(ast):
-    #         break
-    #     ast = ast[idx + 3:]
     nodes = []
     ast = json.loads(ast)
     for index in ast.keys():
         nodes.append(ast[index])  
     return sorted(nodes, key=getIndex)
+
 
 def getVocab():
     # 获得几种特征的词表
@@ -246,24 +211,24 @@ def getVocab():
     apiseq_vocab_to_int, apiseq_int_to_vocab = getVocabForOther(apiseqs, cf.n_words)
 
     # 以上这些特征可以转为编号后重新写入数据库
-    connect = pymysql.Connect(
-        host="0.0.0.0",
-        port=3306,
-        user="root",
-        passwd="Taylorswift-1997",
-        db="githubreposfile",
-        charset='utf8'
-    )
-    cursor = connect.cursor()
-    # todo
-    sql = """CREATE TABLE numrepresent (
-         id  INT(20) NOT NULL,
-         methName  BLOB,
-         token BLOB,  
-         desc BLOB,
-         apiseq BLOB )"""
+    # connect = pymysql.Connect(
+    #     host="0.0.0.0",
+    #     port=3306,
+    #     user="root",
+    #     passwd="Taylorswift-1997",
+    #     db="githubreposfile",
+    #     charset='utf8'
+    # )
+    # cursor = connect.cursor()
+    # # todo
+    # sql = """CREATE TABLE numrepresent (
+    #      id  INT(20) NOT NULL,
+    #      methName  BLOB,
+    #      token BLOB,
+    #      desc BLOB,
+    #      apiseq BLOB )"""
 
-    cursor.execute(sql)
+    # cursor.execute(sql)
 
     for info in datas:
         methNameNum = " ".join(toNum(info["methName"], methName_vocab_to_int))
@@ -271,30 +236,14 @@ def getVocab():
         descNum = " ".join(toNum(info["desc"], desc_vocab_to_int))
         apiseqNum = " ".join(toNum(info["apiseq"], apiseq_vocab_to_int))
 
-        insert = """"INSERT INTO NUMREPRESENT(id, methName, token, desc, apiseq)
-                     VALUES(%d,%s,%s,%s,%s,%s)"""
-        data = (info["id"], methNameNum, tokenNum, descNum, apiseqNum)
-        cursor.execute(insert, data)
-        connect.commit()
+        # insert = """"INSERT INTO NUMREPRESENT(id, methName, token, desc, apiseq)
+        #              VALUES(%d,%s,%s,%s,%s,%s)"""
+        # data = (info["id"], methNameNum, tokenNum, descNum, apiseqNum)
+        # cursor.execute(insert, data)
+        # connect.commit()
 
-    cursor.close()
-    connect.close()
-
-    # methNamesNum = []
-    # for methName in methNames:
-    #     methNamesNum.append(toNum(methName, methName_vocab_to_int))
-    #
-    # tokensNum = []
-    # for token in tokens:
-    #     tokensNum.append(toNum(token, token_vocab_to_int))
-    #
-    # descsNum = []
-    # for desc in descs:
-    #     descsNum.append(toNum(desc, desc_vocab_to_int))
-    #
-    # apiseqsNum = []
-    # for apiseq in apiseqs:
-    #     apiseqsNum.append(toNum(apiseq, apiseq_vocab_to_int))
+    # cursor.close()
+    # connect.close()
 
     ast_vocab_to_int, ast_int_to_vocab = getVocabForAST(asts, cf.n_words)
 
