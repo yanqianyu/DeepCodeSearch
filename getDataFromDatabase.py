@@ -5,6 +5,43 @@ import re
 import random
 
 
+def tuNum(data, vocab):
+    # 转为编号表示
+    pass
+
+
+def parseInput(sent):
+    return [z for z in sent.split(' ')]
+
+
+def getVocabForOther(datas):
+    # 为其他特征生成词表
+    vocab = {}
+    counts = {}
+    for data in datas:
+        words = parseInput(data)
+        for word in words:
+            counts[word] = counts.get(counts[word], 0) + 1
+        vocab.update(words)
+    return vocab, counts
+
+
+def getVocabForAST(asts):
+    # 为ast的type和value生成词表 获得所有的type和value
+    vocab = {}
+    counts = {}
+    for ast in asts:
+        for node in ast:
+            if "type" in node.keys():
+                counts[node["type"]] = counts.get(counts[node["type"]], 0) + 1
+                vocab.update(node["type"])
+            # code2seq中path不包括value
+            # if "value" in node.keys():
+            #     counts[node["value"]] = counts.get(counts[node["value"]], 0) + 1
+            #     vocab.update(node["value"])
+    return vocab, counts
+
+
 def dfs(ast, root, path, totalpath):
     # 深度遍历 得到多条路径
     if "children" in ast[root["index"]].keys():
@@ -13,7 +50,8 @@ def dfs(ast, root, path, totalpath):
             dfs(ast, ast[child], path, totalpath)
             path.pop()
     else:
-        path.append(root["value"])
+        # path.append(root["value"])
+        # code2seq中叶节点内容不包含在path中 而是subtoken
         totalpath.append(' '.join(path))
         return
 
@@ -114,6 +152,8 @@ def getPath(pathNum):
         # 这一步替换注
         ast = ast.replace("children:", "\"children\":").replace("index:", "\"index\":").replace("value:", "\"value\":").replace("type:", "\"type\":")
         ast = str2list(ast)
+
+
         nPath = getNPath(ast, pathNum)  # 针对每个ast的n条路径
         sbt = ' '.join(getSBT(ast, ast[0])) # 得到李戈的sbt树
         print(sbt)
