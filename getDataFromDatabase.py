@@ -211,9 +211,9 @@ def getVocab():
         apiseq = str(data[i][5], encoding="utf-8")
         apiseqs.append(apiseq)
 
-        with open("example.txt", 'r') as f:
-            ast = f.readlines()
-            ast = " ".join(ast)
+        # with open("example.txt", 'r') as f:
+        #     ast = f.readlines()
+        #     ast = " ".join(ast)
 
         ast = str(data[i][-1], encoding="utf-8")[1:-1].replace("=", ":").replace("\n", " ")
         # ast = ast[1:-1].replace("=", ":").replace("\n", " ")
