@@ -231,7 +231,7 @@ def getVocab():
         descsNum.append(toNum(desc, desc_vocab_to_int))
 
     apiseqsNum = []
-    for apiseq in apiseqsNum:
+    for apiseq in apiseqs:
         apiseqsNum.append(toNum(apiseq, apiseq_vocab_to_int))
 
 
