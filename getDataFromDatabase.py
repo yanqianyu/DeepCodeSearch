@@ -188,7 +188,11 @@ def getVocab():
     rawcodes = []
     apiseqs = []
 
+    # todo: 绑定id
+
     for i in range(len(data)):
+        id = data[i][0]
+
         methName = str(data[i][1], encoding="utf-8")
         methNames.append(methName)
 
@@ -237,6 +241,19 @@ def getVocab():
 
     ast_vocab_to_int, ast_int_to_vocab = getVocabForAST(asts, cf.n_words)
 
+    # ast的词表保存在本地
+    save_vocab("vocab_ast.json", ast_vocab_to_int)
+
+
+def save_vocab(path, params):
+    with open(path, 'w') as f:
+        json.dump(params, f)
+
+
+def load_vocab(path):
+    with open(path,'r') as f:
+        return json.load(f)
+
 
 def getPath(asts, pathNum, ast_vocab_to_int):
     # 每次训练路径都是随机抽取的
@@ -250,4 +267,7 @@ def getPath(asts, pathNum, ast_vocab_to_int):
         # sbt = ' '.join(getSBT(ast, ast[0]))  # 得到李戈的sbt树
     return astPathNum
 
+
+getVocab()
+ast_vocab_to_int = load_vocab("vocab_ast.json")
 
