@@ -128,41 +128,47 @@ def getIndex(node):
 
 
 def str2list(ast):
+    # while len(ast) > 0:
+    #     idx = ast.find("},")
+    #     if idx == -1:
+    #         idx = ast.find("}")
+    #     node = ast[:idx + 1]
+    #
+    #     idx1 = node.find("type")
+    #     if idx1 != -1:
+    #         idx3 = node.find(",", idx1)
+    #         if idx3 == -1:
+    #             idx3 = node.find("}", idx1)
+    #         type = node[idx1 + 6: idx3]
+    #         new_type = '"' + type + '"'
+    #         node = node[0: idx1 + 6] + new_type + node[idx3:]
+    #         # node = node.replace(type, new_type)
+    #
+    #     idx2 = node.find("value")
+    #     if idx2 != -1:
+    #         idx4 = node.find(",", idx2)
+    #         if idx4 == -1:
+    #             idx4 = len(node) - 1
+    #             # idx4 = node.find("}", idx2)
+    #         value = node[idx2 + 7: idx4]
+    #         new_value = '"' + value + '"'
+    #         node = node[0: idx2 + 7] + new_value + node[idx4:]
+    #         # node = node.replace(value, new_value)
+    #
+    #     id += 1
+    #     if id == 200:
+    #         print(' ')
+    #     nodes.append(json.loads(node))
+    #     print(node)
+    #
+    #     if idx + 2 > len(ast):
+    #         break
+    #     ast = ast[idx + 3:]
     nodes = []
-    while len(ast) > 0:
-        idx = ast.find("},")
-        if idx == -1:
-            idx = ast.find("}")
-        node = ast[:idx + 1]
-
-        idx1 = node.find("type")
-        if idx1 != -1:
-            idx3 = node.find(",", idx1)
-            if idx3 == -1:
-                idx3 = node.find("}", idx1)
-            type = node[idx1 + 6: idx3]
-            new_type = '"' + type + '"'
-            node = node[0: idx1 + 6] + new_type + node[idx3:]
-            # node = node.replace(type, new_type)
-
-        idx2 = node.find("value")
-        if idx2 != -1:
-            idx4 = node.find(",", idx2)
-            if idx4 == -1:
-                idx4 = len(node) - 1
-                # idx4 = node.find("}", idx2)
-            value = node[idx2 + 7: idx4]
-            new_value = '"' + value + '"'
-            node = node[0: idx2 + 7] + new_value + node[idx4:]
-            # node = node.replace(value, new_value)
-        nodes.append(json.loads(node))
-        # print(node)
-
-        if idx + 2 > len(ast):
-            break
-        ast = ast[idx + 3:]
+    ast = json.loads(ast)
+    for index in ast.keys():
+        nodes.append(ast[index])  
     return sorted(nodes, key=getIndex)
-
 
 def getVocab():
     # 获得几种特征的词表
@@ -211,14 +217,14 @@ def getVocab():
         apiseq = str(data[i][5], encoding="utf-8")
         apiseqs.append(apiseq)
 
-        # with open("example.txt", 'r') as f:
-        #     ast = f.readlines()
-        #     ast = " ".join(ast)
+        with open("example.txt", 'r') as f:
+            ast = f.readlines()
+            ast = " ".join(ast)
 
-        ast = str(data[i][-1], encoding="utf-8")[1:-1].replace("=", ":").replace("\n", " ")
+        ast = str(data[i][-1], encoding="utf-8")
         # ast = ast[1:-1].replace("=", ":").replace("\n", " ")
         # 这一步替换注
-        ast = ast.replace("children:", "\"children\":").replace("index:", "\"index\":").replace("value:", "\"value\":").replace("type:", "\"type\":")
+        # ast = ast.replace("children:", "\"children\":").replace("index:", "\"index\":").replace("value:", "\"value\":").replace("type:", "\"type\":")
         ast = str2list(ast)
         asts.append(ast)
 
