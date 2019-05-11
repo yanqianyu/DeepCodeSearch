@@ -189,6 +189,7 @@ def getVocab():
     apiseqs = []
 
     # todo: 绑定id
+    datas = []
 
     for i in range(len(data)):
         id = data[i][0]
@@ -214,6 +215,16 @@ def getVocab():
         ast = str2list(ast)
         asts.append(ast)
 
+        info = {}
+        info["id"] = id
+        info["methName"] = methName
+        info["token"] = token
+        info["desc"] = desc
+        info["apiseq"] = apiseq
+        info["ast"] = ast
+
+        datas.append(info)
+
     cf = configs.conf()
 
     methName_vocab_to_int, methName_int_to_vocab = getVocabForOther(methNames, cf.n_words)
@@ -222,27 +233,61 @@ def getVocab():
     apiseq_vocab_to_int, apiseq_int_to_vocab = getVocabForOther(apiseqs, cf.n_words)
 
     # 以上这些特征可以转为编号后重新写入数据库
-    methNamesNum = []
-    for methName in methNames:
-        methNamesNum.append(toNum(methName, methName_vocab_to_int))
+    connect = pymysql.Connect(
+        host="0.0.0.0",
+        port=3306,
+        user="root",
+        passwd="Taylorswift-1997",
+        db="githubreposfile",
+        charset='utf8'
+    )
+    cursor = connect.cursor()
+    sql = """CREATE TABLE NUMREPRESENT (id INT(11) NOT NULL,
+                                        methName BLOB,
+                                        token BLOB,
+                                        desc BLOB,
+                                        apiseq BLOB)"""
+    cursor.execute(sql)
 
-    tokensNum = []
-    for token in tokens:
-        tokensNum.append(toNum(token, token_vocab_to_int))
+    for info in datas:
+        methNameNum = " ".join(toNum(info["methName"], methName_vocab_to_int))
+        tokenNum = " ".join(toNum(info["token"], token_vocab_to_int))
+        descNum = " ".join(toNum(info["desc"], desc_vocab_to_int))
+        apiseqNum = " ".join(toNum(info["apiseq"], apiseq_vocab_to_int))
 
-    descsNum = []
-    for desc in descs:
-        descsNum.append(toNum(desc, desc_vocab_to_int))
+        insert = """"INSERT INTO NUMREPRESENT(id, methName, token, desc, apiseq)
+                     VALUES(%s,%s,%s,%s,%s,%s)"""
+        data = (info["id"], methNameNum, tokenNum, descNum, apiseqNum)
+        cursor.execute(insert, data)
+        connect.commit()
 
-    apiseqsNum = []
-    for apiseq in apiseqs:
-        apiseqsNum.append(toNum(apiseq, apiseq_vocab_to_int))
+    cursor.close()
+    connect.close()
 
+    # methNamesNum = []
+    # for methName in methNames:
+    #     methNamesNum.append(toNum(methName, methName_vocab_to_int))
+    #
+    # tokensNum = []
+    # for token in tokens:
+    #     tokensNum.append(toNum(token, token_vocab_to_int))
+    #
+    # descsNum = []
+    # for desc in descs:
+    #     descsNum.append(toNum(desc, desc_vocab_to_int))
+    #
+    # apiseqsNum = []
+    # for apiseq in apiseqs:
+    #     apiseqsNum.append(toNum(apiseq, apiseq_vocab_to_int))
 
     ast_vocab_to_int, ast_int_to_vocab = getVocabForAST(asts, cf.n_words)
 
     # ast的词表保存在本地
     save_vocab("vocab_ast.json", ast_vocab_to_int)
+    save_vocab("vocab_methName.json", methName_vocab_to_int)
+    save_vocab("vocab_token.json", token_vocab_to_int)
+    save_vocab("vocab_desc.json", desc_vocab_to_int)
+    save_vocab("vocab_apiseq_json", apiseq_vocab_to_int)
 
 
 def save_vocab(path, params):
