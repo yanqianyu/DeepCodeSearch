@@ -130,14 +130,16 @@ def getIndex(node):
 def str2list(ast):
     nodes = []
     while len(ast) > 0:
-        idx = ast.index('}')
+        idx = ast.find("},")
+        if idx == -1:
+            idx = ast.find("}")
         node = ast[:idx + 1]
 
         idx1 = node.find("type")
         if idx1 != -1:
             idx3 = node.find(",", idx1)
             if idx3 == -1:
-                idx3 = node.index("}", idx1)
+                idx3 = node.find("}", idx1)
             type = node[idx1 + 6: idx3]
             new_type = '"' + type + '"'
             node = node[0: idx1 + 6] + new_type + node[idx3:]
@@ -147,13 +149,14 @@ def str2list(ast):
         if idx2 != -1:
             idx4 = node.find(",", idx2)
             if idx4 == -1:
-                idx4 = node.index("}", idx2)
+                idx4 = len(node) - 1
+                # idx4 = node.find("}", idx2)
             value = node[idx2 + 7: idx4]
             new_value = '"' + value + '"'
             node = node[0: idx2 + 7] + new_value + node[idx4:]
             # node = node.replace(value, new_value)
-
         nodes.append(json.loads(node))
+        print(node)
 
         if idx + 2 > len(ast):
             break
@@ -188,7 +191,6 @@ def getVocab():
     rawcodes = []
     apiseqs = []
 
-    # todo: 绑定id
     datas = []
 
     for i in range(len(data)):
@@ -209,7 +211,12 @@ def getVocab():
         apiseq = str(data[i][5], encoding="utf-8")
         apiseqs.append(apiseq)
 
-        ast = str(data[i][-1], encoding="utf-8")[1:-1].replace("=", ":").replace("\n", " ")
+        with open("example.txt", 'r') as f:
+            ast = f.readlines()
+            ast = " ".join(ast)
+
+        # ast = str(data[i][-1], encoding="utf-8")[1:-1].replace("=", ":").replace("\n", " ")
+        ast = ast[1:-1].replace("=", ":").replace("\n", " ")
         # 这一步替换注
         ast = ast.replace("children:", "\"children\":").replace("index:", "\"index\":").replace("value:", "\"value\":").replace("type:", "\"type\":")
         ast = str2list(ast)
@@ -244,11 +251,11 @@ def getVocab():
     cursor = connect.cursor()
     # todo
     sql = """CREATE TABLE numrepresent (
-         id  CHAR(20) NOT NULL,
-         methName  CHAR(20),
-         token INT,  
-         desc CHAR(1),
-         apiseq FLOAT )"""
+         id  INT(20) NOT NULL,
+         methName  BLOB,
+         token BLOB,  
+         desc BLOB,
+         apiseq BLOB )"""
 
     cursor.execute(sql)
 
